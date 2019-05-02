@@ -43,14 +43,22 @@ public class Main extends Application {
         root.setLeft(world);
         Scene scene = new Scene(root);
 
-        Timeline timeline = new Timeline(/* Implement me! */);
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(DELAY),e->world.step()));
+        timeline.setCycleCount(Animation.INDEFINITE);
 
         scene.setOnKeyPressed(event -> {
-            // Implement me!
+           boolean running = world.StartOrStop();
+           boolean pressed = event.getCode() == KeyCode.S;
+           if(pressed && running)
+                timeline.play();
+           else
+               timeline.pause();
         });
 
         scene.setOnMouseMoved((MouseEvent e) -> {
-            // Implement me!
+            double x = e.getX();
+            double y = e.getY();
+            world.redirectSnake(x,y);     
         });
 
         primaryStage.setTitle("Snake");
