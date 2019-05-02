@@ -27,8 +27,8 @@ public class World extends Pane {
         food = new Food();
         getChildren().add(food);
         moveFoodRandomly();
+        scoreText.bind(score.asString().concat(" points"));
     }
-    
     
     public boolean foundFoodAt( int x, int y ){
         return food.foundAt(x, y);
@@ -43,7 +43,6 @@ public class World extends Pane {
        running = false;
     }
 
-    
     public void step(){
         if ( running ) {
             snake.moveOneStep();
@@ -54,8 +53,7 @@ public class World extends Pane {
         running = !running;
         return running;
     } 
-            
-            
+                   
     private void moveFoodRandomly(){
         food.moveTo(random.nextInt(SIZE), random.nextInt(SIZE));
     }
@@ -75,7 +73,6 @@ public class World extends Pane {
             snake.setDirection(snakeX > worldX ? Direction.Left : Direction.Right );
         } else {
             snake.setDirection(snakeY > worldY ? Direction.Up : Direction.Down );
-        }
-        
+        }       
     }
 }
