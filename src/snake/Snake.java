@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.ListIterator;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -14,7 +18,7 @@ import javafx.scene.shape.Rectangle;
  */
 public class Snake {
     private final List<Segment> body;
-    private Color segmentColor = Color.GREEN;
+    private final Color segmentColor = Color.GREEN;
     private Direction direction = Direction.Down;
     private final World world;
 
@@ -24,12 +28,16 @@ public class Snake {
         private final IntegerProperty segY;
 
         public Segment(int x, int y, Color color) {
+            
             super(World.UNIT, World.UNIT, color);
             segX = new SimpleIntegerProperty(x);
             segY = new SimpleIntegerProperty(y);
             translateXProperty().bind(segX.multiply(World.UNIT));
             translateYProperty().bind(segY.multiply(World.UNIT));
             world.getChildren().add(this);
+            BackgroundFill background_fill = new BackgroundFill(Color.BURLYWOOD,CornerRadii.EMPTY, Insets.EMPTY); 
+            Background background = new Background(background_fill); 
+            world.setBackground(background);
         }
 
         public int getValX() {
@@ -43,8 +51,7 @@ public class Snake {
         public void setLocation( int x, int y ){
             segX.setValue(x);
             segY.setValue(y);
-        }
-        
+        }     
     }
 
     public Snake(int x, int y, World world) {
@@ -57,8 +64,24 @@ public class Snake {
     private boolean canMoveTo( int x, int y ) {
         return x >= 0 && x < World.SIZE && y >= 0 && y < World.SIZE;
     }
+    
     public void moveOneStep(){
-        // Implement me!
+            int newX = getX()+direction.getdX();
+            int newY = getY()+direction.getdY();
+                 
+            if (world.foundFoodAt(newX, newY)){
+                world.eatFood();
+                int tailX = body.get(body.size()-1).getValX();
+                int tailY = body.get(body.size()-1).getValY(); 
+                body.add(new Segment(tailX,tailY,segmentColor));
+            }
+            if(!canMoveTo(newX,newY) || bitesItself(newX,newY))
+                world.stop(); 
+            else{
+                moveBody();
+                body.get(0).setLocation(newX,newY);
+                
+            }
     }
 
     private void moveBody(  ) {
@@ -66,8 +89,8 @@ public class Snake {
         ListIterator<Segment> lit = body.listIterator(body.size()-1); 
         while( lit.hasPrevious() ) {
             Segment current = lit.previous();
-            successor.setLocation(current.getValX(), current.getValY());
-            successor = current;
+            successor.setLocation(current.getValX(), current.getValY()); 
+            successor = current;   
         }
     }
 
@@ -83,9 +106,11 @@ public class Snake {
     public int getX() {
         return body.get(0).getValX();
     }
+    
     public int getY() {
         return body.get(0).getValY();
     }
+    
     public void setDirection( Direction newDirection ) {
         direction = newDirection;
     }
